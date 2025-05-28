@@ -1,0 +1,508 @@
+        // Add tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                const tabName = this.dataset.tab;
+                document.querySelector(`.tab-content[data-tab-content="${tabName}"]`).classList.add('active');
+            });
+        });
+        
+        // Add event listener for save button
+        document.getElementById('save-properties')?.addEventListener('click', () => {
+            saveProperties(element, type);
+        });
+    }
+    
+    // Set current values for form controls
+    function setCurrentValues(element, type) {
+        // Common properties
+        const margin = element.style.margin || '';
+        const padding = element.style.padding || '';
+        const bgColor = element.style.backgroundColor || '';
+        
+        if (document.getElementById('element-margin')) {
+            document.getElementById('element-margin').value = margin;
+        }
+        if (document.getElementById('element-padding')) {
+            document.getElementById('element-padding').value = padding;
+        }
+        if (document.getElementById('element-background')) {
+            document.getElementById('element-background').value = rgbToHex(bgColor) || '#ffffff';
+        }
+        
+        // Type-specific properties
+        switch (type) {
+            case 'heading':
+                const heading = element.querySelector('h1,h2,h3,h4,h5,h6');
+                if (heading) {
+                    const currentAlign = heading.style.textAlign || 'left';
+                    if (document.getElementById('text-align')) {
+                        document.getElementById('text-align').value = currentAlign;
+                    }
+                    
+                    const currentColor = heading.style.color || '#000000';
+                    if (document.getElementById('text-color')) {
+                        document.getElementById('text-color').value = rgbToHex(currentColor);
+                    }
+                    
+                    const currentSize = heading.style.fontSize || '';
+                    if (document.getElementById('font-size')) {
+                        document.getElementById('font-size').value = currentSize;
+                    }
+                }
+                break;
+                
+            case 'paragraph':
+                const paragraph = element.querySelector('p');
+                if (paragraph) {
+                    const currentAlign = paragraph.style.textAlign || 'left';
+                    if (document.getElementById('text-align')) {
+                        document.getElementById('text-align').value = currentAlign;
+                    }
+                    
+                    const currentColor = paragraph.style.color || '#000000';
+                    if (document.getElementById('text-color')) {
+                        document.getElementById('text-color').value = rgbToHex(currentColor);
+                    }
+                    
+                    const currentSize = paragraph.style.fontSize || '';
+                    if (document.getElementById('font-size')) {
+                        document.getElementById('font-size').value = currentSize;
+                    }
+                }
+                break;
+                
+            case 'button':
+                const button = element.querySelector('button');
+                if (button) {
+                    const currentBgColor = button.style.backgroundColor || 'rgb(67, 97, 238)';
+                    if (document.getElementById('button-color')) {
+                        document.getElementById('button-color').value = rgbToHex(currentBgColor);
+                    }
+                    
+                    const currentTextColor = button.style.color || 'rgb(255, 255, 255)';
+                    if (document.getElementById('button-text-color')) {
+                        document.getElementById('button-text-color').value = rgbToHex(currentTextColor);
+                    }
+                    
+                    const currentRadius = button.style.borderRadius || '';
+                    if (document.getElementById('button-radius')) {
+                        document.getElementById('button-radius').value = currentRadius;
+                    }
+                    
+                    // Check if button has a click handler for a link
+                    if (button.onclick) {
+                        // This would need a more robust way to extract the URL
+                        // For now, we'll just show that there is a link
+                        if (document.getElementById('button-link')) {
+                            document.getElementById('button-link').placeholder = "Link is set";
+                        }
+                    }
+                }
+                break;
+                
+            case 'image':
+                const img = element.querySelector('img');
+                if (img) {
+                    const currentWidth = img.style.width || '';
+                    if (document.getElementById('image-width')) {
+                        document.getElementById('image-width').value = currentWidth;
+                    }
+                    
+                    const currentAlign = element.style.textAlign || 'center';
+                    if (document.getElementById('image-align')) {
+                        document.getElementById('image-align').value = currentAlign;
+                    }
+                }
+                break;
+                
+            case 'divider':
+                const hr = element.querySelector('hr');
+                if (hr) {
+                    const currentStyle = hr.style.borderTopStyle || 'solid';
+                    if (document.getElementById('divider-style')) {
+                        document.getElementById('divider-style').value = currentStyle;
+                    }
+                    
+                    const currentColor = hr.style.borderTopColor || '#000000';
+                    if (document.getElementById('divider-color')) {
+                        document.getElementById('divider-color').value = rgbToHex(currentColor);
+                    }
+                    
+                    const currentWidth = hr.style.width || '100%';
+                    if (document.getElementById('divider-width')) {
+                        document.getElementById('divider-width').value = currentWidth;
+                    }
+                    
+                    const currentThickness = parseInt(hr.style.borderTopWidth) || 1;
+                    if (document.getElementById('divider-thickness')) {
+                        document.getElementById('divider-thickness').value = currentThickness;
+                    }
+                }
+                break;
+                
+            case 'columns':
+                const cols = element.querySelectorAll('.col');
+                if (cols) {
+                    const colCount = cols.length;
+                    if (document.getElementById('column-count')) {
+                        document.getElementById('column-count').value = colCount;
+                    }
+                }
+                break;
+        }
+        
+        // Advanced properties
+        if (document.getElementById('custom-classes')) {
+            document.getElementById('custom-classes').value = element.className.replace('canvas-element', '').trim();
+        }
+        
+        if (document.getElementById('custom-id')) {
+            document.getElementById('custom-id').value = element.id || '';
+        }
+    }
+    
+    // Save properties from the form to the element
+    function saveProperties(element, type) {
+        // Common properties
+        const margin = document.getElementById('element-margin')?.value;
+        const padding = document.getElementById('element-padding')?.value;
+        const bgColor = document.getElementById('element-background')?.value;
+        
+        if (margin) element.style.margin = margin;
+        if (padding) element.style.padding = padding;
+        if (bgColor) element.style.backgroundColor = bgColor;
+        
+        // Type-specific properties
+        switch (type) {
+            case 'heading':
+                const headingText = document.getElementById('heading-text')?.value;
+                const headingLevel = document.getElementById('heading-level')?.value;
+                const textAlign = document.getElementById('text-align')?.value;
+                const textColor = document.getElementById('text-color')?.value;
+                const fontSize = document.getElementById('font-size')?.value;
+                
+                let heading = element.querySelector('h1,h2,h3,h4,h5,h6');
+                if (!heading) {
+                    heading = document.createElement(headingLevel || 'h2');
+                    element.innerHTML = '';
+                    element.appendChild(heading);
+                } else if (heading.tagName.toLowerCase() !== headingLevel) {
+                    const newHeading = document.createElement(headingLevel || 'h2');
+                    newHeading.textContent = heading.textContent;
+                    element.replaceChild(newHeading, heading);
+                    heading = newHeading;
+                }
+                
+                if (headingText) heading.textContent = headingText;
+                if (textAlign) heading.style.textAlign = textAlign;
+                if (textColor) heading.style.color = textColor;
+                if (fontSize) heading.style.fontSize = fontSize;
+                break;
+                
+            case 'paragraph':
+                const paragraphText = document.getElementById('paragraph-text')?.value;
+                const pTextAlign = document.getElementById('text-align')?.value;
+                const pTextColor = document.getElementById('text-color')?.value;
+                const pFontSize = document.getElementById('font-size')?.value;
+                
+                let paragraph = element.querySelector('p');
+                if (!paragraph) {
+                    paragraph = document.createElement('p');
+                    element.innerHTML = '';
+                    element.appendChild(paragraph);
+                }
+                
+                if (paragraphText) paragraph.textContent = paragraphText;
+                if (pTextAlign) paragraph.style.textAlign = pTextAlign;
+                if (pTextColor) paragraph.style.color = pTextColor;
+                if (pFontSize) paragraph.style.fontSize = pFontSize;
+                break;
+                
+            case 'button':
+                const buttonText = document.getElementById('button-text')?.value;
+                const buttonLink = document.getElementById('button-link')?.value;
+                const buttonColor = document.getElementById('button-color')?.value;
+                const buttonTextColor = document.getElementById('button-text-color')?.value;
+                const buttonRadius = document.getElementById('button-radius')?.value;
+                
+                let button = element.querySelector('button');
+                if (!button) {
+                    button = document.createElement('button');
+                    element.innerHTML = '';
+                    element.appendChild(button);
+                }
+                
+                if (buttonText) button.textContent = buttonText;
+                if (buttonColor) button.style.backgroundColor = buttonColor;
+                if (buttonTextColor) button.style.color = buttonTextColor;
+                if (buttonRadius) button.style.borderRadius = buttonRadius;
+                
+                if (buttonLink) {
+                    button.onclick = function() {
+                        window.open(buttonLink, '_blank');
+                    };
+                } else {
+                    button.onclick = null;
+                }
+                break;
+                
+            case 'image':
+                const imageUrl = document.getElementById('image-url')?.value;
+                const imageAlt = document.getElementById('image-alt')?.value;
+                const imageWidth = document.getElementById('image-width')?.value;
+                const imageAlign = document.getElementById('image-align')?.value;
+                
+                let img = element.querySelector('img');
+                if (!img) {
+                    img = document.createElement('img');
+                    element.innerHTML = '';
+                    element.appendChild(img);
+                }
+                
+                if (imageUrl) img.src = imageUrl;
+                if (imageAlt) img.alt = imageAlt;
+                if (imageWidth) img.style.width = imageWidth;
+                if (imageAlign) element.style.textAlign = imageAlign;
+                break;
+                
+            case 'divider':
+                const dividerStyle = document.getElementById('divider-style')?.value;
+                const dividerColor = document.getElementById('divider-color')?.value;
+                const dividerWidth = document.getElementById('divider-width')?.value;
+                const dividerThickness = document.getElementById('divider-thickness')?.value;
+                
+                let hr = element.querySelector('hr');
+                if (!hr) {
+                    hr = document.createElement('hr');
+                    element.innerHTML = '';
+                    element.appendChild(hr);
+                }
+                
+                if (dividerStyle) hr.style.borderTopStyle = dividerStyle;
+                if (dividerColor) hr.style.borderTopColor = dividerColor;
+                if (dividerWidth) hr.style.width = dividerWidth;
+                if (dividerThickness) hr.style.borderTopWidth = `${dividerThickness}px`;
+                break;
+                
+            case 'columns':
+                const columnCount = document.getElementById('column-count')?.value || 2;
+                const currentCols = element.querySelectorAll('.col');
+                
+                if (currentCols.length !== parseInt(columnCount)) {
+                    element.innerHTML = '';
+                    for (let i = 0; i < columnCount; i++) {
+                        const col = document.createElement('div');
+                        col.className = 'col';
+                        col.style.minHeight = '100px';
+                        col.style.background = '#f8f9fa';
+                        col.style.border = '1px dashed #adb5bd';
+                        col.style.padding = '1rem';
+                        col.textContent = `Column ${i+1}`;
+                        element.appendChild(col);
+                    }
+                }
+                break;
+                
+            case 'section':
+                const sectionTitle = document.getElementById('section-title')?.value;
+                if (sectionTitle) {
+                    element.querySelector('div').textContent = sectionTitle;
+                }
+                break;
+        }
+        
+        // Advanced properties
+        const customClasses = document.getElementById('custom-classes')?.value;
+        const customId = document.getElementById('custom-id')?.value;
+        
+        if (customClasses) {
+            element.className = `canvas-element ${customClasses}`.trim();
+        } else {
+            element.className = 'canvas-element';
+        }
+        
+        if (customId) {
+            element.id = customId;
+        } else {
+            element.removeAttribute('id');
+        }
+        
+        // Re-add element actions
+        addElementActions(element);
+        
+        // Show success message
+        showToast('Changes saved successfully!');
+    }
+    
+    // Clear properties panel
+    function clearPropertiesPanel() {
+        propertiesForm.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-mouse-pointer"></i>
+                <p>Select an element to edit its properties</p>
+            </div>
+        `;
+    }
+    
+    // Show preview of the landing page
+    function showPreview() {
+        if (canvas.children.length === 0) {
+            showToast('Please add some elements to the canvas first.', 'warning');
+            return;
+        }
+        
+        // Clone the canvas and clean up for preview
+        const previewClone = canvas.cloneNode(true);
+        
+        // Remove canvas-specific classes and attributes
+        previewClone.className = '';
+        previewClone.id = '';
+        previewClone.style.padding = '0';
+        
+        // Remove element actions and selection classes
+        const elements = previewClone.querySelectorAll('.canvas-element');
+        elements.forEach(el => {
+            el.className = el.className.replace('canvas-element', '').trim();
+            el.querySelector('.element-actions')?.remove();
+            el.style.border = 'none';
+            el.style.backgroundColor = '';
+            el.style.margin = '';
+            el.style.padding = '';
+        });
+        
+        // Clear preview content and add the clone
+        previewContent.innerHTML = '';
+        previewContent.appendChild(previewClone);
+        
+        // Show the modal
+        previewModal.show();
+    }
+    
+    // Export the landing page as HTML
+    function exportHTML() {
+        if (canvas.children.length === 0) {
+            showToast('Please add some elements to the canvas first.', 'warning');
+            return;
+        }
+        
+        // Create a basic HTML structure
+        const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${currentProject.name}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        
+        .col {
+            flex: 1;
+            padding: 0 15px;
+        }
+    </style>
+</head>
+<body>
+    ${canvas.innerHTML.replace(/class="canvas-element"/g, '')
+                     .replace(/class="element-actions"/g, 'style="display:none"')
+                     .replace(/class="selected"/g, '')}
+</body>
+</html>
+        `;
+        
+        // Create a blob and download link
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${currentProject.name.toLowerCase().replace(/\s+/g, '-')}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('HTML exported successfully!');
+    }
+    
+    // Show save modal
+    function showSaveModal() {
+        projectNameInput.value = currentProject.name;
+        saveModal.show();
+    }
+    
+    // Save project
+    function saveProject() {
+        const projectName = projectNameInput.value.trim() || 'Untitled Project';
+        currentProject.name = projectName;
+        currentProject.lastSaved = new Date();
+        
+        // In a real app, you would save to localStorage or a database here
+        // For now, we'll just update the UI
+        
+        saveModal.hide();
+        showToast(`Project "${projectName}" saved successfully!`);
+    }
+    
+    // Helper function to convert RGB to HEX
+    function rgbToHex(rgb) {
+        if (!rgb) return '';
+        if (rgb.startsWith('#')) return rgb;
+        
+        // If rgb is in rgb(r, g, b) format
+        if (rgb.startsWith('rgb')) {
+            const parts = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!parts) return '#000000';
+            
+            const r = parseInt(parts[1], 10);
+            const g = parseInt(parts[2], 10);
+            const b = parseInt(parts[3], 10);
+            
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+        
+        return '#000000';
+    }
+    
+    // Show toast notification
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Initialize the app
+    init();
+});
